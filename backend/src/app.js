@@ -6,9 +6,12 @@ const movieRoutes = require('./routes/movie.route');
 const app = express();
 app.use(
   cors({
-    origin: "https://ai-movie-platform-c63c.vercel.app/",
+    origin: [
+      "https://ai-movie-platform-c63c.vercel.app",
+      "http://localhost:5173",
+    ],
     credentials: true,
-  })
+  }),
 );
 app.use(express.json());
 
