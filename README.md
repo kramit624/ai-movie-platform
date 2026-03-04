@@ -45,6 +45,12 @@ A full-stack movie discovery and review platform that integrates **TMDB** and **
 | IMDb (RapidAPI) | Audience reviews |
 | AI Utility | Review summarization and sentiment |
 
+### Testing
+| Technology | Purpose |
+|---|---|
+| Jest | Test runner and assertion library |
+| Supertest | HTTP integration testing for Express |
+
 ---
 
 ## 🏗 System Architecture
@@ -93,9 +99,11 @@ ai-movie-platform/
 │       │   ├── movieInfo.service.js   # Data aggregation layer
 │       │   ├── review.service.js      # IMDb review fetching
 │       │   └── tmdb.service.js        # TMDB API integration
+│       ├── test/
+│       │   └── movie.test.js          # API integration tests
 │       └── utils/
 │           ├── ai.util.js             # AI insight generation
-│            └── asyncHandler.js      # For try and catch
+│           └── asyncHandler.js        # Async error wrapper
 │
 └── frontend/
     └── src/
@@ -130,13 +138,14 @@ ai-movie-platform/
 
 | Method | Endpoint | Description |
 |---|---|---|
+| `GET` | `/api/v1/health` | Health check — confirms API is running |
 | `GET` | `/api/v1/movies/:imdbId` | Full movie details (metadata + cast + reviews + AI) |
-| `GET` | `/api/v1/search?q=:query` | Search movies and TV shows by name and IMDB Id |
-| `GET` | `/api/v1/trending` | Trending movies of the week |
-| `GET` | `/api/v1/top-rated` | Top rated movies |
-| `GET` | `/api/v1/now-playing` | Currently playing in cinemas |
-| `GET` | `/api/v1/popular` | Popular movies |
-| `GET` | `/api/v1/horror` | Horror genre movies |
+| `GET` | `/api/v1/movies/search?q=:query` | Search movies and TV shows by name or IMDb ID |
+| `GET` | `/api/v1/movies/trending` | Trending movies of the week |
+| `GET` | `/api/v1/movies/top-rated` | Top rated movies |
+| `GET` | `/api/v1/movies/now-playing` | Currently playing in cinemas |
+| `GET` | `/api/v1/movies/popular` | Popular movies |
+| `GET` | `/api/v1/movies/horror` | Horror genre movies |
 
 ### Auth Routes
 
@@ -179,6 +188,54 @@ Generates audience insight from a set of reviews using AI summarization. Returns
 
 ---
 
+## 🧪 Testing
+
+Tests are written using **Jest** and **Supertest** and live in `backend/src/test/`.
+
+### Run Tests
+
+```bash
+cd backend
+npm test
+```
+
+### Test Coverage
+
+**`movie.test.js`** — Integration tests for the Movie API
+
+| Test | Endpoint | Expected |
+|---|---|---|
+| Health check | `GET /api/v1/health` | `200` · `{ message: "API working" }` |
+
+### Example Test Output
+
+```
+PASS src/test/movie.test.js
+  Movie API
+    ✓ health check should return API working (32ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       1 passed, 1 total
+```
+
+### Adding New Tests
+
+Add new test files inside `backend/src/test/`. Follow the existing pattern using `supertest` to make HTTP requests directly against the Express `app` instance — no server needs to be running separately.
+
+```javascript
+const request = require("supertest");
+const app = require("../app");
+
+describe("Your Test Suite", () => {
+  test("description", async () => {
+    const res = await request(app).get("/api/v1/your-endpoint");
+    expect(res.statusCode).toBe(200);
+  });
+});
+```
+
+---
+
 ## 📦 Installation
 
 **Prerequisites:** Node.js ≥ 18, MongoDB instance, TMDB API key, RapidAPI key (IMDb Scraper)
@@ -213,17 +270,16 @@ MONGO_URI=your_mongodb_connection_string
 # TMDB
 TMDB_API_KEY=your_tmdb_api_key
 
-# TOKEN-SECRET
+# Token Secrets
 ACCESS_TOKEN_SECRET=your_access_token_secret
 REFRESH_TOKEN_SECRET=your_refresh_token_secret
 
-
-# TOKEN-SECRET-EXPIRY
+# Token Expiry
 ACCESS_TOKEN_EXPIRY=your_access_token_expiry
 REFRESH_TOKEN_EXPIRY=your_refresh_token_expiry
 
-#NODE-ENV
-NODE_ENV=Your desired environment here (e.g., development, production)
+# Environment
+NODE_ENV=development
 
 # RapidAPI (IMDb Reviews)
 RAPIDAPI_KEY=your_rapidapi_key
@@ -253,6 +309,14 @@ npm run dev
 ---
 
 ## 📡 Example API Response
+
+**`GET /api/v1/health`**
+
+```json
+{
+  "message": "API working"
+}
+```
 
 **`GET /api/v1/movies/tt1375666`** *(Inception)*
 
@@ -329,6 +393,7 @@ npm run dev
 - [ ] AI-powered recommendation engine based on watch history
 - [ ] TV show episode-level detail pages
 - [ ] PWA support for mobile install
+- [ ] Expanded test coverage (search, movie detail, auth endpoints)
 
 ---
 
