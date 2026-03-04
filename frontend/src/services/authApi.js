@@ -2,7 +2,8 @@ import axios from "axios";
 
 // Create an Axios instance for authentication API
 const authApi = axios.create({
-  baseURL: "http://localhost:5000/api/v1/auth",
+  baseURL: `${import.meta.env.VITE_API_URL}api/v1/auth`,
+  withCredentials: true,
 });
 
 // Add token to requests
