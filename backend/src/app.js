@@ -4,7 +4,12 @@ const authRoutes = require('./routes/auth.route');
 const movieRoutes = require('./routes/movie.route');
 
 const app = express();
-app.use(cors());
+app.use(
+  cors({
+    origin: "https://ai-movie-platform-c63c.vercel.app/",
+    credentials: true,
+  })
+);
 app.use(express.json());
 
 // Routes
